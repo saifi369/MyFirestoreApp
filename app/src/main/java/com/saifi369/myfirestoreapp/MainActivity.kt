@@ -6,6 +6,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 
 class MainActivity : AppCompatActivity() {
@@ -18,6 +19,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btn_read: Button
 
     private lateinit var firestoreDatabase: FirebaseFirestore
+    private lateinit var userDocumentRef: DocumentReference
+
+    private val KEY_NAME = "key_name"
+    private val KEY_AGE = "key_age"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +31,7 @@ class MainActivity : AppCompatActivity() {
         initViews()
 
         firestoreDatabase = FirebaseFirestore.getInstance()
+        userDocumentRef = firestoreDatabase.collection("users").document("person1")
 
         btn_save.setOnClickListener { saveData() }
         btn_read.setOnClickListener { readData() }
@@ -39,46 +45,52 @@ class MainActivity : AppCompatActivity() {
 
         var data = hashMapOf<String, Any>()
 
-        data["name"] = name
-        data["age"] = age
+        data[KEY_NAME] = name
+        data[KEY_AGE] = age
 
-        firestoreDatabase.collection("users").document()
-            .set(data)
+        userDocumentRef.set(data)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    tv_output.text = "Data is saved"
+                    showOutput("Data is saved")
                     Toast.makeText(MainActivity@ this, "Data is inserted", Toast.LENGTH_LONG).show()
                 } else {
-                    tv_output.text = task.exception!!.message.toString()
+                    showOutput(task.exception!!.message.toString())
                 }
             }
-
-//        val docData = hashMapOf(
-//            "stringExample" to "Hello world!",
-//            "booleanExample" to true,
-//            "numberExample" to 3.14159265,
-//            "dateExample" to Timestamp(Date()),
-//            "listExample" to arrayListOf(1, 2, 3),
-//            "nullExample" to null
-//        )
-//
-//        val nestedData = hashMapOf(
-//            "a" to 5,
-//            "b" to true
-//        )
-//
-//        docData["objectExample"] = nestedData
-//
-//        firestoreDatabase.collection("test").document("data")
-//            .set(docData)
-//            .addOnSuccessListener {
-//                tv_output.text="Data is inserted"
-//            }
-
     }
 
     private fun readData() {
         //this method reads data from firestore
+
+        userDocumentRef.get()
+
+            .addOnSuccessListener { document ->
+
+                if (document.exists()) {
+
+                    val name = document.getString(KEY_NAME)
+                    val age = document.getLong(KEY_AGE)
+
+//                    val data = document.data
+//
+//                    val name=data?.get(KEY_NAME).toString()
+//                    val age=data?.get(KEY_AGE).toString()
+
+                    showOutput(name!!)
+                    showOutput(age.toString())
+
+                } else {
+                    showOutput("Person does not exist")
+                }
+            }
+
+    }
+
+    private fun showOutput(text: String) {
+        if (tv_output.text == "Ready to Learn!")
+            tv_output.text = ""
+
+        tv_output.append("$text\n")
 
     }
 
