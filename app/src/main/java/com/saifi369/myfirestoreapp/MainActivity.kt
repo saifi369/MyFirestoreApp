@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Source
 
 class MainActivity : AppCompatActivity() {
 
@@ -62,7 +63,7 @@ class MainActivity : AppCompatActivity() {
     private fun readData() {
         //this method reads data from firestore
 
-        userDocumentRef.get()
+        userDocumentRef.get(Source.DEFAULT)
 
             .addOnSuccessListener { document ->
 
@@ -82,6 +83,9 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     showOutput("Person does not exist")
                 }
+            }
+            .addOnFailureListener {
+                showOutput(it.localizedMessage)
             }
 
     }
