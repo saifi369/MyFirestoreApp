@@ -1,13 +1,13 @@
 package com.saifi369.myfirestoreapp
 
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.util.Log
+import android.view.View
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.Source
 
 class MainActivity : AppCompatActivity() {
@@ -18,6 +18,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tv_output: TextView
     private lateinit var btn_save: Button
     private lateinit var btn_read: Button
+    private lateinit var scrollview: ScrollView
 
     private lateinit var firestoreDatabase: FirebaseFirestore
     private lateinit var userDocumentRef: DocumentReference
@@ -32,12 +33,44 @@ class MainActivity : AppCompatActivity() {
         initViews()
 
         firestoreDatabase = FirebaseFirestore.getInstance()
-        userDocumentRef = firestoreDatabase.collection("users").document("person1")
+        userDocumentRef = firestoreDatabase
+            .collection("users").document("person1")
 
         btn_save.setOnClickListener { saveData() }
         btn_read.setOnClickListener { readData() }
     }
 
+    override fun onStart() {
+        super.onStart()
+        userDocumentRef.addSnapshotListener(this, MetadataChanges.INCLUDE) { snapshot, e ->
+
+            if (e != null) {
+                Toast.makeText(MainActivity@ this, "Error while loading data", Toast.LENGTH_LONG)
+                    .show()
+                Log.d("MyTag", e.localizedMessage)
+                return@addSnapshotListener
+            } else {
+                if (snapshot != null && snapshot.exists()) {
+
+                    val name = snapshot.getString(KEY_NAME)
+                    val age = snapshot.getLong(KEY_AGE)
+
+                    val source = if (snapshot.metadata.hasPendingWrites())
+                        "Local"
+                    else
+                        "Server"
+
+                    showOutput(name!!)
+                    showOutput(age.toString())
+                    showOutput(source)
+
+                } else {
+                    showOutput("Person does not exist")
+                }
+            }
+        }
+
+    }
     private fun saveData() {
         //this method saves data in firestore
 
@@ -95,6 +128,9 @@ class MainActivity : AppCompatActivity() {
             tv_output.text = ""
 
         tv_output.append("$text\n")
+        scrollview.post {
+            scrollview.fullScroll(View.FOCUS_DOWN)
+        }
 
     }
 
@@ -105,5 +141,6 @@ class MainActivity : AppCompatActivity() {
         tv_output = findViewById(R.id.tv_output)
         btn_save = findViewById(R.id.btn_save_data)
         btn_read = findViewById(R.id.btn_read_data)
+        scrollview = findViewById(R.id.scroll_view)
     }
 }
