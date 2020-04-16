@@ -62,6 +62,15 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:text="Read Data"
+        app:layout_constraintBottom_toTopOf="@+id/btn_update_data"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <Button
+        android:id="@+id/btn_update_data"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Update Data"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 

@@ -7,7 +7,6 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.Source
 
 class MainActivity : AppCompatActivity() {
@@ -18,6 +17,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tv_output: TextView
     private lateinit var btn_save: Button
     private lateinit var btn_read: Button
+    private lateinit var btn_update: Button
     private lateinit var scrollview: ScrollView
 
     private lateinit var firestoreDatabase: FirebaseFirestore
@@ -38,11 +38,12 @@ class MainActivity : AppCompatActivity() {
 
         btn_save.setOnClickListener { saveData() }
         btn_read.setOnClickListener { readData() }
+        btn_update.setOnClickListener { updateData() }
     }
 
     override fun onStart() {
         super.onStart()
-        userDocumentRef.addSnapshotListener(this, MetadataChanges.INCLUDE) { snapshot, e ->
+        userDocumentRef.addSnapshotListener(this) { snapshot, e ->
 
             if (e != null) {
                 Toast.makeText(MainActivity@ this, "Error while loading data", Toast.LENGTH_LONG)
@@ -55,14 +56,8 @@ class MainActivity : AppCompatActivity() {
                     val name = snapshot.getString(KEY_NAME)
                     val age = snapshot.getLong(KEY_AGE)
 
-                    val source = if (snapshot.metadata.hasPendingWrites())
-                        "Local"
-                    else
-                        "Server"
-
                     showOutput(name!!)
                     showOutput(age.toString())
-                    showOutput(source)
 
                 } else {
                     showOutput("Person does not exist")
@@ -71,6 +66,7 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+
     private fun saveData() {
         //this method saves data in firestore
 
@@ -123,6 +119,24 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun updateData() {
+        //this method updates data in firestore
+
+        val name = et_name.text.toString().trim()
+        val age = et_age.text.toString().toInt()
+
+        val data: HashMap<String, Any> = hashMapOf(
+            KEY_NAME to name,
+            KEY_AGE to age
+        )
+
+//        userDocumentRef.set(data, SetOptions.merge())
+
+//        userDocumentRef.update(KEY_NAME,name)
+
+        userDocumentRef.set(data)
+    }
+
     private fun showOutput(text: String) {
         if (tv_output.text == "Ready to Learn!")
             tv_output.text = ""
@@ -141,6 +155,8 @@ class MainActivity : AppCompatActivity() {
         tv_output = findViewById(R.id.tv_output)
         btn_save = findViewById(R.id.btn_save_data)
         btn_read = findViewById(R.id.btn_read_data)
+        btn_update = findViewById(R.id.btn_update_data)
         scrollview = findViewById(R.id.scroll_view)
+
     }
 }
