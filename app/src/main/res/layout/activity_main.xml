@@ -33,11 +33,10 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/btn_read_data"
+        app:layout_constraintBottom_toTopOf="@+id/btn_save_data"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_age"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintTop_toBottomOf="@+id/et_age">
 
         <TextView
             android:id="@+id/tv_output"
@@ -53,7 +52,25 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:text="Save Data"
+        app:layout_constraintBottom_toTopOf="@+id/btn_delete_field"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <Button
+        android:id="@+id/btn_delete_person"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Delete Person"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <Button
+        android:id="@+id/btn_delete_field"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Delete Name"
+        app:layout_constraintBottom_toTopOf="@id/btn_delete_person"
         app:layout_constraintLeft_toLeftOf="parent" />
 
     <Button

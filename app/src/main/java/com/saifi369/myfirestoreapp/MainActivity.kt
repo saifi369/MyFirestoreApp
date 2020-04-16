@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
 
@@ -18,6 +19,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btn_save: Button
     private lateinit var btn_read: Button
     private lateinit var btn_update: Button
+    private lateinit var btn_delete_person: Button
+    private lateinit var btn_delete_field: Button
     private lateinit var scrollview: ScrollView
 
     private lateinit var firestoreDatabase: FirebaseFirestore
@@ -39,6 +42,8 @@ class MainActivity : AppCompatActivity() {
         btn_save.setOnClickListener { saveData() }
         btn_read.setOnClickListener { readData() }
         btn_update.setOnClickListener { updateData() }
+        btn_delete_person.setOnClickListener { deletePerson() }
+        btn_delete_field.setOnClickListener { deleteName() }
     }
 
     override fun onStart() {
@@ -56,7 +61,7 @@ class MainActivity : AppCompatActivity() {
                     val name = snapshot.getString(KEY_NAME)
                     val age = snapshot.getLong(KEY_AGE)
 
-                    showOutput(name!!)
+                    showOutput(name.toString())
                     showOutput(age.toString())
 
                 } else {
@@ -137,6 +142,26 @@ class MainActivity : AppCompatActivity() {
         userDocumentRef.set(data)
     }
 
+    private fun deleteName() {
+        //this method deletes a single field from any firestore document
+
+//        val data: HashMap<String, Any> = hashMapOf(
+//            KEY_NAME to FieldValue.delete()
+//        )
+//
+//        userDocumentRef.update(data)
+
+        userDocumentRef.update(KEY_NAME, FieldValue.delete())
+
+    }
+
+    private fun deletePerson() {
+        //this method deletes a complete document from firestore database
+
+        userDocumentRef.delete()
+
+    }
+
     private fun showOutput(text: String) {
         if (tv_output.text == "Ready to Learn!")
             tv_output.text = ""
@@ -155,6 +180,8 @@ class MainActivity : AppCompatActivity() {
         tv_output = findViewById(R.id.tv_output)
         btn_save = findViewById(R.id.btn_save_data)
         btn_read = findViewById(R.id.btn_read_data)
+        btn_delete_field = findViewById(R.id.btn_delete_field)
+        btn_delete_person = findViewById(R.id.btn_delete_person)
         btn_update = findViewById(R.id.btn_update_data)
         scrollview = findViewById(R.id.scroll_view)
 
