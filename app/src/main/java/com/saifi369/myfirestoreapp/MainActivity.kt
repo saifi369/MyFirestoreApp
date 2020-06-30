@@ -3,25 +3,15 @@ package com.saifi369.myfirestoreapp
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.*
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
-
-    //ui views
-    private lateinit var et_name: EditText
-    private lateinit var et_age: EditText
-    private lateinit var tv_output: TextView
-    private lateinit var btn_save: Button
-    private lateinit var btn_read: Button
-    private lateinit var btn_update: Button
-    private lateinit var btn_delete_person: Button
-    private lateinit var btn_delete_field: Button
-    private lateinit var scrollview: ScrollView
 
     private lateinit var firestoreDatabase: FirebaseFirestore
     private lateinit var userDocumentRef: DocumentReference
@@ -33,15 +23,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        initViews()
-
         firestoreDatabase = FirebaseFirestore.getInstance()
         userDocumentRef = firestoreDatabase
             .collection("users").document("person1")
 
-        btn_save.setOnClickListener { saveData() }
-        btn_read.setOnClickListener { readData() }
-        btn_update.setOnClickListener { updateData() }
+        btn_save_data.setOnClickListener { saveData() }
+        btn_read_data.setOnClickListener { readData() }
+        btn_update_data.setOnClickListener { updateData() }
         btn_delete_person.setOnClickListener { deletePerson() }
         btn_delete_field.setOnClickListener { deleteName() }
     }
@@ -58,12 +46,8 @@ class MainActivity : AppCompatActivity() {
             } else {
                 if (snapshot != null && snapshot.exists()) {
 
-                    val name = snapshot.getString(KEY_NAME)
-                    val age = snapshot.getLong(KEY_AGE)
-
-                    showOutput(name.toString())
-                    showOutput(age.toString())
-
+                    val person = snapshot.toObject(Person::class.java)
+                    showOutput(person.toString())
                 } else {
                     showOutput("Person does not exist")
                 }
@@ -78,12 +62,9 @@ class MainActivity : AppCompatActivity() {
         val name = et_name.text.toString().trim()
         val age = et_age.text.toString().toInt()
 
-        var data = hashMapOf<String, Any>()
+        val person = Person(name, age)
 
-        data[KEY_NAME] = name
-        data[KEY_AGE] = age
-
-        userDocumentRef.set(data)
+        userDocumentRef.set(person)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     showOutput("Data is saved")
@@ -103,16 +84,9 @@ class MainActivity : AppCompatActivity() {
 
                 if (document.exists()) {
 
-                    val name = document.getString(KEY_NAME)
-                    val age = document.getLong(KEY_AGE)
+                    val person = document.toObject(Person::class.java)
 
-//                    val data = document.data
-//
-//                    val name=data?.get(KEY_NAME).toString()
-//                    val age=data?.get(KEY_AGE).toString()
-
-                    showOutput(name!!)
-                    showOutput(age.toString())
+                    showOutput(person.toString())
 
                 } else {
                     showOutput("Person does not exist")
@@ -139,7 +113,6 @@ class MainActivity : AppCompatActivity() {
 
 //        userDocumentRef.update(KEY_NAME,name)
 
-        userDocumentRef.set(data)
     }
 
     private fun deleteName() {
@@ -167,23 +140,9 @@ class MainActivity : AppCompatActivity() {
             tv_output.text = ""
 
         tv_output.append("$text\n")
-        scrollview.post {
-            scrollview.fullScroll(View.FOCUS_DOWN)
+        scroll_view.post {
+            scroll_view.fullScroll(View.FOCUS_DOWN)
         }
-
-    }
-
-    private fun initViews() {
-        //this method initializes ui views
-        et_name = findViewById(R.id.et_name)
-        et_age = findViewById(R.id.et_age)
-        tv_output = findViewById(R.id.tv_output)
-        btn_save = findViewById(R.id.btn_save_data)
-        btn_read = findViewById(R.id.btn_read_data)
-        btn_delete_field = findViewById(R.id.btn_delete_field)
-        btn_delete_person = findViewById(R.id.btn_delete_person)
-        btn_update = findViewById(R.id.btn_update_data)
-        scrollview = findViewById(R.id.scroll_view)
 
     }
 }
